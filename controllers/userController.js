@@ -24,3 +24,15 @@ exports.getAllUsers = (req, res, next) => {
     res.json(users);
   });
 };
+
+exports.setUserCity = (req, res, next) => {
+  const id = req.params.id;
+  User.findByIdAndUpdate(
+    id,
+    { $set: { favouriteCity: req.body.city } },
+    (err, doc) => {
+      if (err) return next(err);
+      return res.send('succesfully saved');
+    }
+  );
+};
