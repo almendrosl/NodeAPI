@@ -7,9 +7,9 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const weatherRouter = require('./routes/weather');
+const indexRouter = require('./routes/indexRoutes');
+const usersRouter = require('./routes/usersRoutes');
+const weatherRouter = require('./routes/weatherRouters');
 
 const app = express();
 mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/test', {
@@ -27,25 +27,26 @@ app.use('/weather', weatherRouter);
 
 // Not found middleware
 app.use((req, res, next) => {
-  return next({ status: 404, message: 'not found' })
-})
+  return next({ status: 404, message: 'not found' });
+});
 
 // Error Handling middleware
 app.use((err, req, res, next) => {
-  let errCode, errMessage
+  let errCode, errMessage;
 
   if (err.errors) {
     // mongoose validation error
-    errCode = 400 // bad request
-    const keys = Object.keys(err.errors)
+    errCode = 400; // bad request
+    const keys = Object.keys(err.errors);
     // report the first validation error
-    errMessage = err.errors[keys[0]].message
+    errMessage = err.errors[keys[0]].message;
   } else {
     // generic or custom error
-    errCode = err.status || 500
-    errMessage = err.message || JSON.parse(err.raw_body) || 'Internal Server Error'
+    errCode = err.status || 500;
+    errMessage =
+      err.message || JSON.parse(err.raw_body) || 'Internal Server Error';
   }
-  res.status(errCode).send(errMessage)
-})
+  res.status(errCode).send(errMessage);
+});
 
 module.exports = app;
