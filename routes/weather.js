@@ -1,11 +1,8 @@
 var express = require('express');
 var router = express.Router();
-const weather = require('../app/weather');
+const weatherController = require('../controllers/weatherController');
 
 /* GET weather . */
-router.get('/', function(req, res, next) {
-  weather.getWeather();
-  res.send('respond with from weather');
-});
+router.get('/', weatherController.weather);
 
 module.exports = router;
