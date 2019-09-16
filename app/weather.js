@@ -20,6 +20,5 @@ exports.getWeather = (city = 'Cordoba, Cordoba, Argentina', cb) => {
   req.end(function(res) {
     if (res.error) return cb(res);
     cb(null, res.body);
-    console.log(res.body);
   });
 };
