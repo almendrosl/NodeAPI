@@ -1,18 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-/* GET users listing. */
-router.get('/', userController.getAllUsers);
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 
-router.get('/:id', userController.getOneUser);
+/* GET users listing. */
+router.get('/', auth, admin, userController.getAllUsers);
+
+router.get('/current', auth, userController.getCurrent);
+
+router.get('/:id', auth, userController.getOneUser);
 
 /* POST user, save in db. */
 router.post('/', userController.add);
 
-router.delete('/:id', userController.delete);
+router.delete('/:id', auth, admin, userController.delete);
 
-router.put('/:id', userController.updateUser);
+router.put('/:id', auth, userController.updateUser);
 
-router.put('/saveCity/:id', userController.setUserCity);
+router.put('/saveCity/:id', auth, userController.setUserCity);
+
+router.post('/login', userController.login);
+
+router.get('/logout', userController.logout);
 
 module.exports = router;

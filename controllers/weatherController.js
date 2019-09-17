@@ -10,7 +10,7 @@ exports.weather = (req, res, next) => {
 };
 
 exports.weatherFromUser = (req, res, next) => {
-  const id = req.params.id;
+  const id = req.user._id;
   user.findById(id, 'favouriteCity', (err, queryRes) => {
     if (err) return next(err);
     const city = queryRes.favouriteCity;

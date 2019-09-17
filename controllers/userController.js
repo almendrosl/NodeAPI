@@ -1,4 +1,5 @@
-const User = require('../models/userModel');
+const { User, validate } = require('../models/userModel');
+const bcrypt = require('bcrypt');
 
 exports.getAllUsers = (req, res, next) => {
   User.find((err, users) => {
@@ -16,20 +17,34 @@ exports.getOneUser = (req, res, next) => {
 };
 
 exports.add = (req, res, next) => {
-  let user = new User({
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  user = new User({
+    name: req.body.name,
+    password: req.body.password,
     email: req.body.email
   });
 
-  user.save(function(err, user) {
-    if (err) {
-      if (err.code === 11000) {
-        res.send('email already taken');
+  bcrypt.hash(user.password, 10, function(err, hash) {
+    if (err) return next(err);
+    user.password = hash;
+    user.save(function(err, user) {
+      if (err) {
+        if (err.code === 11000) {
+          res.send('email already taken');
+        } else {
+          return next(err);
+        }
       } else {
-        return next(err);
+        const token = user.generateAuthToken();
+        res.header('x-auth-token', token).send({
+          _id: user._id,
+          name: user.name,
+          email: user.email
+        });
       }
-    } else {
-      res.json(user);
-    }
+    });
   });
 };
 
@@ -63,4 +78,37 @@ exports.setUserCity = (req, res, next) => {
       return res.send('succesfully saved');
     }
   );
+};
+
+exports.getCurrent = (req, res, next) => {
+  User.findById(req.user._id, { password: 0 }, (err, user) => {
+    if (err) return next(err);
+    res.json(user);
+  });
+};
+
+exports.login = (req, res, next) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  User.findOne({ email: req.body.email }, function(err, user) {
+    if (err) return res.status(500).send('Error on the server.');
+    if (!user) return res.status(404).send('No user found.');
+
+    bcrypt.compare(req.body.password, user.password, (err, comp) => {
+      if (err) return next(err);
+      if (!comp) return res.status(401).send({ auth: false, token: null });
+
+      const token = user.generateAuthToken();
+
+      res.header('x-auth-token', token).send({
+        _id: user._id,
+        name: user.name,
+        email: user.email
+      });
+    });
+  });
+};
+
+exports.logout = (req, res, next) => {
+  res.status(200).send({ auth: false, token: null });
 };
