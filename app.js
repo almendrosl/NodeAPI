@@ -13,7 +13,9 @@ const weatherRouter = require('./routes/weatherRouters');
 
 const app = express();
 mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/test', {
-  useNewUrlParser: true
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true
 });
 app.use(logger('dev'));
 app.use(express.json());
