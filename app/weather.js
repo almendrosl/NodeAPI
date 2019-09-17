@@ -1,4 +1,4 @@
-var unirest = require('unirest');
+const unirest = require('unirest');
 
 exports.getWeather = (city = 'Cordoba, Cordoba, Argentina', cb) => {
   var req = unirest(
