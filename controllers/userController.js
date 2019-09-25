@@ -23,7 +23,8 @@ exports.add = (req, res, next) => {
   user = new User({
     name: req.body.name,
     password: req.body.password,
-    email: req.body.email
+    email: req.body.email,
+    isAdmin: req.body.isAdmin
   });
 
   bcrypt.hash(user.password, 10, function(err, hash) {
@@ -31,11 +32,7 @@ exports.add = (req, res, next) => {
     user.password = hash;
     user.save(function(err, user) {
       if (err) {
-        if (err.code === 11000) {
-          res.send('email already taken');
-        } else {
-          return next(err);
-        }
+        return next(err);
       } else {
         const token = user.generateAuthToken();
         res.header('x-auth-token', token).send({
@@ -90,7 +87,7 @@ exports.getCurrent = (req, res, next) => {
 exports.login = (req, res, next) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  User.findOne({ email: req.body.email }, function(err, user) {
+  User.findOne({ email: req.body.email }, (err, user) => {
     if (err) return res.status(500).send('Error on the server.');
     if (!user) return res.status(404).send('No user found.');
 
@@ -109,6 +106,6 @@ exports.login = (req, res, next) => {
   });
 };
 
-exports.logout = (req, res, next) => {
+exports.logout = (req, res) => {
   res.status(200).send({ auth: false, token: null });
 };

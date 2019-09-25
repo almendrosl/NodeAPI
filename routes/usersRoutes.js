@@ -9,6 +9,8 @@ router.get('/', auth, admin, userController.getAllUsers);
 
 router.get('/current', auth, userController.getCurrent);
 
+router.get('/logout', userController.logout);
+
 router.get('/:id', auth, userController.getOneUser);
 
 /* POST user, save in db. */
@@ -22,6 +24,5 @@ router.put('/saveCity/:id', auth, userController.setUserCity);
 
 router.post('/login', userController.login);
 
-router.get('/logout', userController.logout);
 
 module.exports = router;

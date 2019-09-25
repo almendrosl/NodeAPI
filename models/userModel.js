@@ -56,7 +56,8 @@ function validateUser(user) {
     password: Joi.string()
       .min(3)
       .max(255)
-      .required()
+      .required(),
+    isAdmin: Joi.boolean()
   };
 
   return Joi.validate(user, schema);

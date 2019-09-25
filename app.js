@@ -42,6 +42,9 @@ app.use((err, req, res, next) => {
     const keys = Object.keys(err.errors);
     // report the first validation error
     errMessage = err.errors[keys[0]].message;
+  } else if (err.name === 'MongoError' && err.code === 11000) {
+    errCode = 400;
+    errMessage = err.message;
   } else {
     // generic or custom error
     errCode = err.status || 500;
